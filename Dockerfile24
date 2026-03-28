@@ -38,7 +38,7 @@ RUN groupadd keycloak
 RUN useradd -r -g keycloak -d /opt/keycloak -s /sbin/nologin keycloak
 
 # set the directory ownership 
-RUN chown -R keycloak: keycloak 
+RUN chown -R keycloak: /opt/keycloak 
 RUN chmod o+x /opt/keycloak/bin
 
 
