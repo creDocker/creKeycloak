@@ -1,0 +1,65 @@
+# Keycloak Dockerfile 
+#
+# https://github.com/tamboraorg/docker/crekeycloak
+#
+
+# Pull base image.
+FROM credocker/creubuntu:2024.0
+
+MAINTAINER Michael Kahle <michael.kahle@yahoo.de>
+
+ARG BUILD_YEAR=2024
+ARG BUILD_MONTH=0
+ARG BUILD_TAG=latest
+
+KEYCLOAK_VERSION=26.5.6
+
+# version: yyyy.n for stable versions / 0.yyyy for development
+
+LABEL Name="Keycloak for CRE" \
+      CRE=$CRE_VERSION \ 
+      Year=$BUILD_YEAR \
+      Month=$BUILD_MONTH \
+      Version=$KEYCLOAK_VERSION \
+      OS="Ubuntu:$UBUNTU_VERSION" \
+      Build_=$BUILD_TAG 
+
+# install keycloak
+# https://dev.to/yaznzamel/keycloak-2205-on-ubuntu-with-postgresql-4h0n
+RUN apt-get update && apt-get -y --no-install-recommends install postgresql-client-common && apt-get clean 
+
+# any external software should be in the /opt
+RUN cd /opt && \ 
+    wget https://github.com/keycloak/keycloak/releases/download/$KEYCLOAK_VERSION/keycloak-$KEYCLOAK_VERSION.tar.gz && \
+    tar -xvf keycloak-$KEYCLOAK_VERSION.tar.gz 
+
+# create a keycloak user and group
+RUN groupadd keycloak
+RUN useradd -r -g keycloak -d /opt/keycloak -s /sbin/nologin keycloak
+
+# set the directory ownership 
+RUN chown -R keycloak: keycloak 
+RUN chmod o+x /opt/keycloak/bin
+
+
+
+
+# Freeze python requirements here:
+RUN mkdir -p /cre && \ 
+    uv pip freeze --no-cache-dir > /cre/requirements.txt.orig
+
+RUN mkdir -p /cre && touch /cre/versions.txt && \ 
+   echo "$(date +'%F %R') \t creKeycloak \t $CRE_VERSION" >> /cre/versions.txt && \
+   echo "$(date +'%F %R') \t   keycloak \t $KEYCLOAK_VERSION" >> /cre/versions.txt 
+
+
+
+COPY cre /cre
+
+WORKDIR /cre/keycloak   ##  ??
+#WORKDIR /cre
+
+#EXPOSE 8000
+
+ENTRYPOINT ["/cre/keycloak-entrypoint.sh"]
+CMD ["shoreman", "/cre/keycloak-procfile"]
