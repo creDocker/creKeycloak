@@ -35,6 +35,8 @@ RUN cd /opt && \
     wget https://github.com/keycloak/keycloak/releases/download/$KEYCLOAK_VERSION/keycloak-$KEYCLOAK_VERSION.tar.gz && \
     tar -xvf keycloak-$KEYCLOAK_VERSION.tar.gz && ls -l
 
+RUN mv /opt/keycloak-26.5.6 /opt/keycloak
+
 # create a keycloak user and group
 RUN groupadd keycloak
 RUN useradd -r -g keycloak -d /opt/keycloak -s /sbin/nologin keycloak
