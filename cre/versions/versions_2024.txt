@@ -8,7 +8,7 @@ creBuild 	 2026.09
    uv 	 
    uv2 	 
    numpy 	 2.5.3
-   pandas 	 3.0.5
+   pandas 	 3.0.6
    Flask 	 
  creKeycloak 	 2024.0
    keycloak 	 26.5.6
